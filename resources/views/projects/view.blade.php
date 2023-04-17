@@ -137,11 +137,26 @@
                 success: function (data) {
                     mainEle.html(data.html);
                     $('[id^=fire-modal]').remove();
-                    loadConfirm();
+                    // loadConfirm();
                 }
             });
         }
 
+    </script>
+
+    {{--share project copy link--}}
+    <script>
+        function copyToClipboard(element) {
+
+            var copyText = element.id;
+            document.addEventListener('copy', function (e) {
+                e.clipboardData.setData('text/plain', copyText);
+                e.preventDefault();
+            }, true);
+
+            document.execCommand('copy');
+            show_toastr('success', 'Url copied to clipboard', 'success');
+        }
     </script>
 @endpush
 @section('breadcrumb')
@@ -151,6 +166,18 @@
 @endsection
 @section('action-btn')
     <div class="float-end">
+        @can('share project')
+            <a href="#" class="btn btn-sm btn-primary" data-ajax-popup="true" data-size="md" data-title="{{ __('Shared Project Settings') }}"
+               data-url="{{route('projects.copylink.setting.create',[ $project->id])}}"
+               data-toggle="tooltip" title="{{ __('Shared project settings') }}">
+                <i class="ti ti-settings text-white"></i>
+            </a>
+            @php $projectID= Crypt::encrypt($project->id); @endphp
+            <a href="#" id="{{ route('projects.link', \Illuminate\Support\Facades\Crypt::encrypt($project->id)) }}" class="btn btn-sm btn-primary btn-icon m-1"
+               onclick="copyToClipboard(this)" data-bs-toggle="tooltip" title="{{__('Click to copy link')}}">
+                <i class="ti ti-link text-white"></i>
+            </a>
+        @endcan
         @can('view grant chart')
             <a href="{{ route('projects.gantt',$project->id) }}" class="btn btn-sm btn-primary">
                 {{__('Gantt Chart')}}
@@ -188,6 +215,7 @@
                 <i class="ti ti-pencil"></i>
             </a>
         @endcan
+
 
     </div>
 @endsection
@@ -460,7 +488,9 @@
                                                         <span class="badge-xs badge bg-{{\App\Models\Project::$status_color[$milestone->status]}} p-2 px-3 rounded">{{ __(\App\Models\Project::$project_status[$milestone->status]) }}</span>
                                                     </h6>
                                                     <small class="text-muted">{{ $milestone->tasks->count().' '. __('Tasks') }}</small>
+
                                                 </div>
+
                                             </div>
                                         </div>
                                         <div class="col-sm-auto text-sm-end d-flex align-items-center">

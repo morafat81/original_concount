@@ -77,14 +77,20 @@ class LeaveController extends Controller
             if($validator->fails())
             {
                 $messages = $validator->getMessageBag();
-
                 return redirect()->back()->with('error', $messages->first());
             }
 
 
             $employee = Employee::where('user_id', '=', Auth::user()->id)->first();
+            $leave_type = LeaveType::find($request->leave_type_id);
+            $startDate = new \DateTime($request->start_date);
+            $endDate = new \DateTime($request->end_date);
+            $endDate->add(new \DateInterval('P1D'));
+            $total_leave_days = !empty($startDate->diff($endDate)) ? $startDate->diff($endDate)->days : 0;
+            if ($leave_type->days >= $total_leave_days)
+            {
             $leave    = new Leave();
-            if(\Auth::user()->type == "employee")
+            if(\Auth::user()->type == "Employee")
             {
                 $leave->employee_id = $employee->id;
             }
@@ -96,7 +102,7 @@ class LeaveController extends Controller
             $leave->applied_on       = date('Y-m-d');
             $leave->start_date       = $request->start_date;
             $leave->end_date         = $request->end_date;
-            $leave->total_leave_days = 0;
+            $leave->total_leave_days = $total_leave_days;
             $leave->leave_reason     = $request->leave_reason;
             $leave->remark           = $request->remark;
             $leave->status           = 'Pending';
@@ -104,10 +110,11 @@ class LeaveController extends Controller
 
             $leave->save();
 
-            return redirect()->route('leave.index')->with('success', __('Leave  successfully created.'));
-        }
-        else
-        {
+                return redirect()->route('leave.index')->with('success', __('Leave successfully created.'));
+            } else {
+                return redirect()->back()->with('error', __('Leave type ' . $leave_type->name . ' is provide maximum ' . $leave_type->days . "  days please make sure your selected days is under " . $leave_type->days . ' days.'));
+            }
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -163,17 +170,31 @@ class LeaveController extends Controller
                     return redirect()->back()->with('error', $messages->first());
                 }
 
-                $leave->employee_id      = $request->employee_id;
-                $leave->leave_type_id    = $request->leave_type_id;
-                $leave->start_date       = $request->start_date;
-                $leave->end_date         = $request->end_date;
-                $leave->total_leave_days = 0;
-                $leave->leave_reason     = $request->leave_reason;
-                $leave->remark           = $request->remark;
+                $leave_type = LeaveType::find($request->leave_type_id);
 
-                $leave->save();
+                $startDate = new \DateTime($request->start_date);
+                $endDate = new \DateTime($request->end_date);
+                $endDate->add(new \DateInterval('P1D'));
+                $total_leave_days = !empty($startDate->diff($endDate)) ? $startDate->diff($endDate)->days : 0;
+                if ($leave_type->days >= $total_leave_days)
+                {
 
-                return redirect()->route('leave.index')->with('success', __('Leave successfully updated.'));
+                    $leave->employee_id      = $request->employee_id;
+                    $leave->leave_type_id    = $request->leave_type_id;
+                    $leave->start_date       = $request->start_date;
+                    $leave->end_date         = $request->end_date;
+                    $leave->total_leave_days = $total_leave_days;
+                    $leave->leave_reason     = $request->leave_reason;
+                    $leave->remark           = $request->remark;
+
+                    $leave->save();
+
+                    return redirect()->route('leave.index')->with('success', __('Leave successfully updated.'));
+                }
+                else
+                {
+                    return redirect()->back()->with('error', __('Leave type ' . $leave_type->name . ' is provide maximum ' . $leave_type->days . "  days please make sure your selected days is under " . $leave_type->days . ' days.'));
+                }
             }
             else
             {

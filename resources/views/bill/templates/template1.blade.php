@@ -296,7 +296,7 @@
                         @php
                             $itemtax = 0;
                         @endphp
-                        <td>
+                        <td>        
                             @if(!empty($item->itemTax))
 
                                 @foreach($item->itemTax as $taxes)

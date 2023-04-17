@@ -172,6 +172,11 @@ Route::get('/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])->n
 Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
     ->name('verification.send');
 
+Route::get('/', [DashboardController::class, 'account_dashboard_index'])->name('home')->middleware(['XSS', 'revalidate',]);
+
+Route::get('/home', [DashboardController::class, 'account_dashboard_index'])->name('home')->middleware(['XSS', 'revalidate',]);
+Route::get('/', [DashboardController::class, 'account_dashboard_index'])->name('dashboard')->middleware(['XSS', 'revalidate',]);
+
 //Route::get('/register/{lang?}', function () {
 //    $settings = Utility::settings();
 //    $lang = $settings['default_language'];
@@ -232,14 +237,24 @@ Route::post('/paymentwall', [PaymentWallPaymentController::class, 'invoicepaymen
 Route::post('/invoice-pay-with-paymentwall/{plan}', [PaymentWallPaymentController::class, 'invoicePayWithPaymentwall'])->name('invoice.pay.with.paymentwall')->middleware(['XSS']);
 Route::get('/invoices/{flag}/{invoice}', [PaymentWallPaymentController::class, 'invoiceerror'])->name('error.invoice.show');
 
+//career page
+Route::get('career/{id}/{lang}', [JobController::class, 'career'])->name('career')->middleware(['XSS']);
+Route::get('job/requirement/{code}/{lang}', [JobController::class, 'jobRequirement'])->name('job.requirement')->middleware(['XSS']);
+Route::get('job/apply/{code}/{lang}', [JobController::class, 'jobApply'])->name('job.apply')->middleware(['XSS']);
+Route::post('job/apply/data/{code}', [JobController::class, 'jobApplyData'])->name('job.apply.data')->middleware(['XSS']);
+
+//project copy module
+Route::get('/projects/copylink/{id}',[ProjectController::class,'projectCopyLink'])->name('projects.copylink');
+Route::any('/projects/link/{id}/{lang?}',[ProjectController::class,'projectlink'])->name('projects.link')->middleware(['XSS']);
+Route::get('timesheet-table-view', [TimesheetController::class, 'filterTimesheetTableView'])->name('filter.timesheet.table.view')->middleware([ 'XSS']);
+
+
+
 //================================= Invoice Payment Gateways  ====================================//
 
 Route::group(['middleware' => ['verified']], function () {
 
-    Route::get('/', [DashboardController::class, 'account_dashboard_index'])->name('home')->middleware(['XSS', 'revalidate',]);
 
-    Route::get('/home', [DashboardController::class, 'account_dashboard_index'])->name('home')->middleware(['XSS', 'revalidate',]);
-    Route::get('/', [DashboardController::class, 'account_dashboard_index'])->name('dashboard')->middleware(['XSS', 'revalidate',]);
     Route::get('/account-dashboard', [DashboardController::class, 'account_dashboard_index'])->name('dashboard')->middleware(['auth','XSS', 'revalidate']);
     Route::get('/project-dashboard', [DashboardController::class, 'project_dashboard_index'])->name('project.dashboard')->middleware(['auth','XSS', 'revalidate']);
     Route::get('/hrm-dashboard', [DashboardController::class, 'hrm_dashboard_index'])->name('hrm.dashboard')->middleware(['auth','XSS', 'revalidate']);
@@ -864,10 +879,7 @@ Route::group(['middleware' => ['verified']], function () {
 
     Route::resource('job', JobController::class)->middleware(['auth', 'XSS']);
 
-    Route::get('career/{id}/{lang}', [JobController::class, 'career'])->name('career')->middleware(['XSS']);
-    Route::get('job/requirement/{code}/{lang}', [JobController::class, 'jobRequirement'])->name('job.requirement')->middleware(['XSS']);
-    Route::get('job/apply/{code}/{lang}', [JobController::class, 'jobApply'])->name('job.apply')->middleware(['XSS']);
-    Route::post('job/apply/data/{code}', [JobController::class, 'jobApplyData'])->name('job.apply.data')->middleware(['XSS']);
+
     Route::get('candidates-job-applications', [JobApplicationController::class, 'candidate'])->name('job.application.candidate')->middleware(['XSS']);
 
     Route::resource('job-application', JobApplicationController::class)->middleware(['auth', 'XSS']);
@@ -1057,7 +1069,7 @@ Route::group(['middleware' => ['verified']], function () {
 
     // Project Timesheet
     Route::get('append-timesheet-task-html', [TimesheetController::class, 'appendTimesheetTaskHTML'])->name('append.timesheet.task.html')->middleware(['auth', 'XSS']);
-    Route::get('timesheet-table-view', [TimesheetController::class, 'filterTimesheetTableView'])->name('filter.timesheet.table.view')->middleware(['auth', 'XSS']);
+//    Route::get('timesheet-table-view', [TimesheetController::class, 'filterTimesheetTableView'])->name('filter.timesheet.table.view')->middleware(['auth', 'XSS']);
     Route::get('timesheet-view', [TimesheetController::class, 'filterTimesheetView'])->name('filter.timesheet.view')->middleware(['auth', 'XSS']);
     Route::get('timesheet-list', [TimesheetController::class, 'timesheetList'])->name('timesheet.list')->middleware(['auth', 'XSS']);
     Route::get('timesheet-list-get', [TimesheetController::class, 'timesheetListGet'])->name('timesheet.list.get')->middleware(['auth', 'XSS']);
@@ -1521,6 +1533,13 @@ Route::group(['middleware' => ['verified']], function () {
     //branch wise department get in attendance report
     Route::post('reports-monthly-attendance/getdepartment', [ReportController::class, 'getdepartment'])->name('report.attendance.getdepartment')->middleware(['auth', 'XSS']);
     Route::post('reports-monthly-attendance/getemployee', [ReportController::class, 'getemployee'])->name('report.attendance.getemployee')->middleware(['auth', 'XSS']);
+
+
+
+    //shared project & copy link
+    Route::any('/projects/copy/link/{id}',[ProjectController::class,'copylinksetting'])->name('projects.copy.link');
+    Route::any('/projects{id}/settingcreate',[ProjectController::class, 'copylink_setting_create'])->name('projects.copylink.setting.create');
+    Route::get('/shareproject/{lang?}', [ProjectController::class, 'shareproject'])->name('shareproject');
 
 
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Task;
+use App\Models\User;
 use App\Models\Utility;
 use App\Models\TaskFile;
 use App\Models\Bug;
@@ -20,26 +21,34 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectTaskController extends Controller
 {
+
     public function index($project_id)
     {
 
         $usr = \Auth::user();
         if(\Auth::user()->can('manage project task'))
         {
-            $project = Project::find($project_id);
-            $stages  = TaskStage::orderBy('order')->where('created_by',\Auth::user()->creatorId())->get();
-            foreach($stages as $status)
-            {
-                $stageClass[] = 'task-list-' . $status->id;
-                $task         = ProjectTask::where('project_id', '=', $project_id);
-                // check project is shared or owner
+            $project = Project::where('id', $project_id)->where('created_by', \Auth::user()->creatorId())->first();
 
-                //end
-                $task->orderBy('order');
-                $status['tasks'] = $task->where('stage_id', '=', $status->id)->get();
+            if($project != null){
+
+                $stages  = TaskStage::orderBy('order')->where('created_by',\Auth::user()->creatorId())->get();
+                foreach($stages as $status)
+                {
+                    $stageClass[] = 'task-list-' . $status->id;
+                    $task         = ProjectTask::where('project_id', '=', $project_id);
+                    // check project is shared or owner
+
+                    //end
+                    $task->orderBy('order');
+                    $status['tasks'] = $task->where('stage_id', '=', $status->id)->get();
+                }
+
+                return view('project_task.index', compact('stages', 'stageClass', 'project'));
+            }else{
+                return redirect()->route('projects.index')->with('error', __('Projeat not found'));
             }
 
-            return view('project_task.index', compact('stages', 'stageClass', 'project'));
         }
         else
         {
@@ -879,8 +888,25 @@ class ProjectTaskController extends Controller
 
     public function getDefaultTaskInfo(Request $request, $task_id)
     {
-        if(\Auth::user()->can('view project task'))
-        {
+
+        if(\Auth::check()){
+            if(\Auth::user()->can('view project task'))
+            {
+                $response = [];
+                $task     = ProjectTask::find($task_id);
+                if($task)
+                {
+                    $response['task_name']     = $task->name;
+                    $response['task_due_date'] = $task->due_date;
+                }
+
+                return json_encode($response);
+            }
+            else
+            {
+                return redirect()->back()->with('error', __('Permission Denied.'));
+            }
+        }else{
             $response = [];
             $task     = ProjectTask::find($task_id);
             if($task)
@@ -891,16 +917,14 @@ class ProjectTaskController extends Controller
 
             return json_encode($response);
         }
-        else
-        {
-            return redirect()->back()->with('error', __('Permission Denied.'));
-        }
+
+
+
     }
+
     // Calendar View
     public function calendarView($task_by, $project_id = NULL)
     {
-
-
 
         $usr = Auth::user();
         $transdate = date('Y-m-d', time());

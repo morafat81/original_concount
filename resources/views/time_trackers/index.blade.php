@@ -80,7 +80,8 @@
                                     <td>{{date("H:i:s",strtotime($trecker->end_time))}}</td>
                                     <td>{{$total_name}}</td>
                                     <td>
-                                        <img alt="Image placeholder" src="{{ asset('assets/images/gallery.png')}}" class="avatar view-images rounded-circle avatar-sm" data-bs-toggle="tooltip" title="{{__('View Screenshot images')}}" data-original-title="{{__('View Screenshot images')}}" style="height: 25px;width:24px;margin-right:10px;cursor: pointer;" data-id="{{$trecker->id}}" id="track-images-{{$trecker->id}}">
+                                        <img alt="Image placeholder" src="{{ asset('assets/images/gallery.png')}}" class="avatar view-images rounded-circle avatar-sm"
+                                             data-bs-toggle="tooltip" title="{{__('View Screenshot images')}}" data-original-title="{{__('View Screenshot images')}}" style="height: 25px;width:24px;margin-right:10px;cursor: pointer;" data-id="{{$trecker->id}}" id="track-images-{{$trecker->id}}">
                                         <div class="action-btn bg-danger ms-2">
                                             {!! Form::open(['method' => 'DELETE', 'route' => ['tracker.destroy', $trecker->id],'id'=>'delete-form-'.$trecker->id]) !!}
 
@@ -145,7 +146,6 @@
             }
         }
 
-
     $(document).on('click', '.view-images', function () {
 
             var p_url = "{{route('tracker.image.view')}}";
@@ -166,9 +166,8 @@
             });
             });
 
-
-            // ============================ Remove Track Image ===============================//
-            $(document).on("click", '.track-image-remove', function () {
+    // ============================ Remove Track Image ===============================//
+    $(document).on("click", '.track-image-remove', function () {
             var rid = $(this).attr('data-pid');
             $('.confirm_yes').addClass('image_remove');
             $('.confirm_yes').attr('image_id', rid);
@@ -176,36 +175,25 @@
             var total = $('.product-left').find('.swiper-slide').length
             });
 
-            function removeImage(id){
-                var p_url = "{{route('tracker.image.remove')}}";
-                var data = {id: id};
-                deleteAjax(p_url, data, function (res) {
-
-                    if(res.flag){
-                        $('#slide-thum-'+id).remove();
-                        $('#slide-'+id).remove();
-                        setTimeout(function(){
-                            var total = $('.product-left').find('.swiper-slide').length
-                            if(total > 0){
-                                init_slider();
-                            }else{
-                                $('.product-left').html('<div class="no-image"><h5 class="text-muted">Images Not Available .</h5></div>');
-                            }
-                        },200);
+    function removeImage(id){
+        var p_url = "{{route('tracker.image.remove')}}";
+        var data = {id: id};
+        deleteAjax(p_url, data, function (res) {
+            if(res.flag){
+                $('#slide-thum-'+id).remove();
+                $('#slide-'+id).remove();
+                setTimeout(function(){
+                    var total = $('.product-left').find('.swiper-slide').length
+                    if(total > 0){
+                        init_slider();
+                    }else{
+                        $('.product-left').html('<div class="no-image"><h5 class="text-muted">Images Not Available .</h5></div>');
                     }
-
-                    $('#cModal').modal('hide');
-                    show_toastr('error',res.msg,'error');
-                });
+                },200);
             }
-
-            // $(document).on("click", '.remove-track', function () {
-            // var rid = $(this).attr('data-id');
-            // $('.confirm_yes').addClass('t_remove');
-            // $('.confirm_yes').attr('uid', rid);
-            // $('#cModal').modal('show');
-        // });
-
-
+            $('#cModal').modal('hide');
+            show_toastr('error',res.msg,'error');
+        });
+    }
 </script>
 @endpush

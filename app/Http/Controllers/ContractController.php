@@ -67,11 +67,8 @@ class ContractController extends Controller
                 return view('contract.index', compact('contracts', 'cnt_contract'));
             }
 
-//            $defualtView         = new Contract();
-//            $defualtView->route  = \Request::route()->getName();
-//            $defualtView->module = 'contract';
-//            $defualtView->view   = 'list';
-//            User::userDefualtView($defualtView);
+            $contracts   = Contract::where('created_by', '=', \Auth::user()->creatorId())->get();
+
             return view('contract.index', compact('contracts'));
 
         }

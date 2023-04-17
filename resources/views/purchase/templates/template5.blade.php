@@ -192,7 +192,7 @@
                         </tr>
                         <tr>
                             <td>{{__('Purchase Date')}}:</td>
-                            <td class="text-right">{{Utility::dateFormat($settings,$purchase->issue_date)}}</td>
+                            <td class="text-right">{{Utility::dateFormat($settings,$purchase->purchase_date)}}</td>
                         </tr>
 
                         @if(!empty($customFields) && count($purchase->customField)>0)

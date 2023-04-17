@@ -109,7 +109,8 @@ class TimeTrackerController extends Controller
 
         $tracker = TimeTracker::find($request->id);
 
-        $images = TrackPhoto::where('track_id',$request->id)->get();
+        $images = TrackPhoto::where('track_id',$request->id)->where('user_id',\Auth::user()->creatorId())->get();
+//        dd($images);
         // dd($images->toArray());
         // dd($tracker);
         return view('time_trackers.images',compact('images','tracker'));

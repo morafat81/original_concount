@@ -58,14 +58,18 @@ class TimesheetController extends Controller
 
                 $period = CarbonPeriod::create($first_day, $seventh_day);
 
-                $returnHTML .= '<tr><td><span class="task-name">' . $task->name . '</span></td>';
+                $returnHTML .= '<tr><td class="task-name">' . $task->name . '</td>';
 
                 foreach($period as $key => $dateobj)
                 {
-                    $returnHTML .= '<td><span class="task-time" data-ajax-timesheet-popup="true" data-type="create" data-task-id="' . $task->id . '" data-date="' . $dateobj->format('Y-m-d') . '" data-url="' . route('timesheet.create', $project_id) . '">-</span></td>';
+                    $returnHTML .= '<td>
+ <input class="form-control border-dark wid-120 task-time day-time1 task-time" data-ajax-timesheet-popup="true" data-type="create" data-task-id="' . $task->id . '" data-date="' . $dateobj->format('Y-m-d') . '" data-url="' . route('timesheet.create', $project_id) . '" value="00:00">';
+
+
                 }
 
-                $returnHTML .= '<td><span class="total-task-time">00:00</span></td></tr>';
+                $returnHTML .= '<td>
+<input class="form-control border-dark wid-120 task-time total-task-time"  type="text" value="00:00" disabled>';
             }
         }
 
@@ -79,25 +83,30 @@ class TimesheetController extends Controller
 
     public function filterTimesheetTableView(Request $request)
     {
-
         $sectionTaskArray = [];
-        $authuser         = Auth::user();
+//        $authuser         = Auth::user();
+
+        $project = Project::find($request->project_id);
+        if(Auth::user() != null){
+            $authuser         = Auth::user();
+        }else{
+            $authuser         = User::where('id',$project->created_by)->first();
+        }
+
         $week             = $request->week;
         $project_id       = $request->project_id;
         $timesheet_type   = 'task';
 
         if($request->has('week') && $request->has('project_id'))
         {
-          if(\Auth::user()->type == 'client'){
+          if($authuser->type == 'client'){
 
             $project_ids = Project::where('client_id',\Auth::user()->id)->pluck('id','id')->toArray();
           }else{
 
             $project_ids = $authuser->projects()->pluck('project_id','project_id')->toArray();
-
           }
             $timesheets  = Timesheet::select('timesheets.*')->join('projects', 'projects.id', '=', 'timesheets.project_id');
-
 
             if($timesheet_type == 'task')
             {
@@ -112,7 +121,6 @@ class TimesheetController extends Controller
                 $projects_timesheet = $timesheets->where('timesheets.project_id', $project_id);
 
             }
-
 
             $days               = Utility::getFirstSeventhWeekDay($week);
             $first_day          = $days['first_day'];
@@ -144,6 +152,7 @@ class TimesheetController extends Controller
                 $task_ids = array_keys($timesheets);
 
                 $project  = Project::find($project_id);
+
                 $sections = ProjectTask::getAllSectionedTaskList($request, $project, [], $task_ids);
 
                 foreach($sections as $key => $section)
@@ -160,7 +169,7 @@ class TimesheetController extends Controller
                     $sectionTaskArray[$key]['tasks'] = $taskArray;
                 }
             }
-//            dd($returnHTML);
+
             return response()->json(
                 [
                     'success' => true,

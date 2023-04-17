@@ -1496,14 +1496,16 @@ class ReportController extends Controller
             }
 
             $types         = ChartOfAccountType::where('created_by',\Auth::user()->creatorId())->get();
+
             $chartAccounts = [];
             foreach($types as $type)
             {
                 $subTypes     = ChartOfAccountSubType::where('type', $type->id)->get();
+
                 $subTypeArray = [];
                 foreach($subTypes as $subType)
                 {
-                    $accounts     = ChartOfAccount::where('type', $type->id)->where('sub_type', $subType->id)->get();
+                    $accounts     = ChartOfAccount::where('created_by',\Auth::user()->creatorId())->where('type', $type->id)->where('sub_type', $subType->id)->get();
                     $accountArray = [];
                     foreach($accounts as $account)
                     {

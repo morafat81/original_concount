@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
@@ -832,12 +833,16 @@ class User extends Authenticatable implements MustVerifyEmail
     // Get task users
     public function tasks()
     {
-        if(\Auth::user()->type=='company'){
-            return ProjectTask::where('created_by',\Auth::user()->creatorId())->get();
+        if(\Auth::check()){
+            $user         = Auth::user();
+        }else{
+            $user         = User::find($this->id);
+        }
+        if($user->type=='company'){
+            return ProjectTask::where('created_by',$user->creatorId())->get();
         }else{
             return ProjectTask::whereRaw("find_in_set('" . $this->id . "',assign_to)")->get();
         }
-
     }
 
     public function bugNumberFormat($number)

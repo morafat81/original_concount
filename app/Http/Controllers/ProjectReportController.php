@@ -71,7 +71,6 @@ class ProjectReportController extends Controller
         }
 
         $projects = $projects->orderby('id','desc')->get();
-//            dd($projects);
 
             return view('project_report.index', compact('projects','users','status'));
         }

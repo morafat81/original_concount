@@ -62,7 +62,7 @@
                 </div>
             </div>
         </div>
-        @if(\Auth::user()->type!='employee')
+        @if(\Auth::user()->type!='Employee')
             <div class="col-md-6 ">
                 <div class="card emp_details">
                     <div class="card-header"><h6 class="mb-0">{{__('Company Detail')}}</h6></div>
@@ -139,7 +139,7 @@
             </div>
         @endif
     </div>
-    @if(\Auth::user()->type!='employee')
+    @if(\Auth::user()->type!='Employee')
         <div class="row">
             <div class="col-md-6 ">
                 <div class="card emp_details">

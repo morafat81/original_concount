@@ -59,10 +59,13 @@
                             @foreach ($task_stages as $key => $task_stage)
 
                             <div class="tab-pane fade show  @if($i==0) active @endif" role="tabpanel">
-                                <ul class="list-group sortable">
+                                <ul class="list-unstyled list-group sortable stage">
                                     @foreach ($task_stages as $task_stage)
-                                        <li class="list-group-item" data-id="{{$task_stage->id}}">
-                                            <span class="text-sm text-dark">{{$task_stage->name}}</span>
+                                        <li class="d-flex align-items-center justify-content-between list-group-item" data-id="{{$task_stage->id}}">
+                                            <h6 class="mb-0">
+                                                <i class="me-3 ti ti-arrows-maximize " data-feather="move"></i>
+                                                <span>{{$task_stage->name}}</span>
+                                            </h6>
                                             <span class="float-end">
                                                 @can('edit project task stage')
                                                     <div class="action-btn bg-info ms-2">
@@ -89,7 +92,8 @@
                             @php($i++)
                             @endforeach
                         </div>
-                        <p class="text-muted mt-4"><strong>{{__('Note')}} : </strong>{{__('You can easily change order of project task stage using drag & drop.')}}</p>
+                        <p class=" mt-4"><strong>{{__('Note')}} : </strong><b>{{__('You can easily change order of project task stage using drag & drop.')}}</b></p>
+
                     </div>
                 </div>
 

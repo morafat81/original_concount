@@ -100,6 +100,27 @@ class Project extends Model
         ];
     }
 
+    //for share project
+    public function project_progress_copy($user_id)
+    {
+        $percentage = 0;
+        $last_task      = TaskStage::orderBy('order', 'DESC')->where('created_by', $user_id)->first();
+        $total_task     = $this->tasks->count();
+        $completed_task = $this->tasks()->where('stage_id', '=', $last_task->id)->where('is_complete', '=', 1)->count();
+        if($total_task > 0)
+        {
+            $percentage = intval(($completed_task / $total_task) * 100);
+        }
+
+        $color = Utility::getProgressColor($percentage);
+
+        return [
+            'color' => $color,
+            'percentage' => $percentage . '%',
+        ];
+    }
+
+
     public function tasks()
     {
         return $this->hasMany('App\Models\ProjectTask', 'project_id', 'id')->orderBy('id', 'desc');
@@ -272,13 +293,23 @@ class Project extends Model
 
     public static function getAssignedProjectTasks($project_id = null, $stage_id = null, $filterdata = [])
     {
-        $authuser = \Auth::user();
+//        $authuser = \Auth::user();
+
         $project  = Project::find($project_id);
+        if(Auth::user() != null){
+            $authuser         = Auth::user();
+        }else{
+            $authuser         = User::where('id',$project->created_by)->first();
+
+        }
         $tasks    = new ProjectTask();
+
 
         if($project)
         {
+
             $task_ids = $authuser->tasks()->pluck('id')->toArray();
+
             $tasks    = $tasks->whereIn('id', $task_ids);
             $tasks = $tasks->where('project_id', '=', $project_id);
         }
@@ -291,6 +322,7 @@ class Project extends Model
         {
             $tasks = $tasks->where('stage_id', '=', $stage_id);
         }
+
 
         return $tasks;
     }

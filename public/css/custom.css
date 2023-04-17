@@ -112,7 +112,7 @@ a.b-brand {
 }
 
 .faq .accordion .accordion-item .accordion-button {
-    font-weight: 700;
+    font-weight: 500;
     padding: 1.3rem 1.25rem;
 }
 
@@ -1349,3 +1349,161 @@ body.theme-4 .cat-list-btn .cat-active .btn-primary {
 }
 /*end pos print */
 
+
+/*start balance-sheet new theme*/
+.nav-pills.cust-nav {
+    background: #E1E9ED;
+}
+.nav-pills.cust-nav .nav-item .nav-link {
+    color: #162C4E;
+}
+
+.data-wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.data-wrapper .data-body{
+    flex: 1;
+}
+
+.data-wrapper .data-body .list-group-item:nth-child(2) {
+    flex: 1;
+}
+
+/* end balance-sheet new theme*/
+
+
+
+/* JOB PAGE START */
+.job-wrapper .navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.job-banner {
+    position: relative;
+    background-color: unset;
+}
+
+.job-banner .job-banner-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.job-banner .job-banner-bg img {
+    width: 100%;
+    height: 100%;
+}
+
+.job-banner .job-banner-content {
+    padding: 5.9% 0;
+    max-width: 360px;
+    width: 100%;
+    margin: auto;
+}
+
+.placedjob-section .section-title {
+    padding: 35px 25px;
+    border-radius: 15px;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    -ms-border-radius: 15px;
+    -o-border-radius: 15px;
+    margin-top: -20px;
+    text-align: center;
+}
+
+.job-card-body {
+    padding: 15px;
+    border-radius: 15px;
+    background: linear-gradient(277.29deg, rgba(111, 217, 67, 0.09) 0.99%, rgba(111, 217, 67, 0) 100.89%);
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    -ms-border-radius: 15px;
+    -o-border-radius: 15px;
+    border: 1px solid #6FD943;
+}
+
+.placedjob-section {
+    padding-bottom: 80px;
+    background-color: unset;
+
+}
+
+.job-content .container {
+    max-width: 1540px;
+}
+
+@media screen and (max-width:767px) {
+    .job-banner .job-banner-content {
+        padding: 10% 0;
+    }
+}
+
+@media screen and (max-width:575px) {
+    .job-banner .job-banner-content {
+        padding: 21% 0;
+    }
+}
+
+.job-card{
+    display: flex;
+    flex-wrap: wrap;
+}
+.job-card .job-card-body{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.job-card .job-card-body h5{
+    flex: 1;
+}
+
+/* JOB PAGE END */
+
+
+/* apply job section */
+
+.apply-job-section {
+    padding-bottom: 80px;
+    background-color: unset;
+
+}
+
+.apply-job-section .apply-job-wrapper{
+    padding: 35px 25px;
+    border-radius: 15px;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    -ms-border-radius: 15px;
+    -o-border-radius: 15px;
+    margin-top: -20px;
+}
+
+@media screen and (max-width:767px) {
+    .job-banner .job-banner-content {
+        padding: 10% 0;
+    }
+    .apply-job-section .apply-job-wrapper{
+        padding: 35px 15px;
+    }
+}
+
+@media screen and (max-width:575px) {
+    .job-banner .job-banner-content {
+        padding: 26% 0;
+    }
+}
+
+/* apply job section */
+.stage li{
+    cursor: pointer;
+}

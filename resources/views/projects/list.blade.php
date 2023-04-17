@@ -19,7 +19,7 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img {{ $project->img_image }} class="wid-40 rounded me-3" alt="avatar image">
+                                            <img {{ $project->img_image }} class="wid-40 rounded me-3" alt="">
                                             <p class="mb-0"><a href="{{ route('projects.show',$project) }}" class="name mb-0 h6 text-sm">{{ $project->project_name }}</a></p>
                                         </div>
                                     </td>
@@ -58,7 +58,7 @@
                                          <span>
                                              @can('edit project')
                                                  <div class="action-btn bg-warning ms-2">
-                                                    <a href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ route('Invite User', $project->id) }}" data-ajax-popup="true" data-size="lg" data-bs-toggle="tooltip" title="{{__('Invite User')}}" data-title="{{__('Invite User')}}">
+                                                    <a href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ route('invite.project.member.view', $project->id) }}" data-ajax-popup="true" data-size="lg" data-bs-toggle="tooltip" title="{{__('Invite User')}}" data-title="{{__('Invite User')}}">
                                                         <i class="ti ti-send text-white"></i>
                                                     </a>
                                                 </div>

@@ -48,7 +48,8 @@
     <div class="row">
         <div class="col-12">
             <div class="alert alert-info note-constant text-xs">
-                <strong>{{__('Note')}} :</strong> {{__('System will consider last stage as a completed / done task for get progress on project.')}}
+                <p class=" mt-4"><strong>{{__('Note')}} : </strong><b>{{__('System will consider last stage as a completed / done task for get progress on project.')}}</b></p>
+
             </div>
         </div>
 

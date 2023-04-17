@@ -69,10 +69,13 @@
                             @php($i=0)
                             @foreach($pipelines as $key => $pipeline)
                                 <div class="tab-pane fade show @if($i==0) active @endif" id="tab{{$key}}" role="tabpanel" aria-labelledby="pills-user-tab-1">
-                                    <ul class="list-group sortable">
+                                    <ul class="list-unstyled list-group sortable stage">
                                         @foreach ($pipeline['stages'] as $stage)
-                                            <li class="list-group-item" data-id="{{$stage->id}}">
-                                                <span class="text-xs text-dark">{{$stage->name}}</span>
+                                            <li class="d-flex align-items-center justify-content-between list-group-item" data-id="{{$stage->id}}">
+                                                <h6 class="mb-0">
+                                                    <i class="me-3 ti ti-arrows-maximize " data-feather="move"></i>
+                                                    <span>{{$stage->name}}</span>
+                                                </h6>
                                                 <span class="float-end">
 
                                                 @can('edit lead stage')
@@ -99,7 +102,7 @@
                                 @php($i++)
                             @endforeach
                         </div>
-                        <p class="text-muted mt-4"><strong>{{__('Note')}} : </strong>{{__('You can easily change order of deal stage using drag & drop.')}}</p>
+                        <p class=" mt-4"><strong>{{__('Note')}} : </strong><b>{{__('You can easily change order of deal stage using drag & drop.')}}</b></p>
                     </div>
                 </div>
             </div>

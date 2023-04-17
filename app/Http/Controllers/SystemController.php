@@ -605,7 +605,7 @@ class SystemController extends Controller
 
     public function saveCompanyPaymentSettings(Request $request)
     {
-//        dd($request->all());
+
 
         if(isset($request->is_stripe_enabled) && $request->is_stripe_enabled == 'on')
         {
@@ -626,7 +626,7 @@ class SystemController extends Controller
         {
             $post['is_stripe_enabled'] = 'off';
         }
-//        dd($post);
+
 
         if(isset($request->is_paypal_enabled) && $request->is_paypal_enabled == 'on')
         {
@@ -788,20 +788,20 @@ class SystemController extends Controller
 
         //save paymentwall Detail
 
-//        dd($post);
+//     dd($request->all());
 
         if(isset($request->is_paymentwall_enabled) && $request->is_paymentwall_enabled == 'on')
         {
             $request->validate(
                 [
                     'paymentwall_public_key' => 'required|string',
-                    'paymentwall_private_key' => 'required|string',
+                    'paymentwall_secret_key' => 'required|string',
                 ]
             );
 
             $post['is_paymentwall_enabled'] = $request->is_paymentwall_enabled;
             $post['paymentwall_public_key'] = $request->paymentwall_public_key;
-            $post['paymentwall_private_key'] = $request->paymentwall_private_key;
+            $post['paymentwall_secret_key'] = $request->paymentwall_secret_key;
         }
         else
         {
@@ -1150,12 +1150,12 @@ class SystemController extends Controller
             $request->validate(
                 [
                     'paymentwall_public_key' => 'required|string',
-                    'paymentwall_private_key' => 'required|string',
+                    'paymentwall_secret_key' => 'required|string',
                 ]
             );
             $post['is_paymentwall_enabled'] = $request->is_paymentwall_enabled;
             $post['paymentwall_public_key'] = $request->paymentwall_public_key;
-            $post['paymentwall_private_key'] = $request->paymentwall_private_key;
+            $post['paymentwall_secret_key'] = $request->paymentwall_secret_key;
         }
         else
         {

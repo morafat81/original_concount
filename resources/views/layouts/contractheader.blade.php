@@ -10,7 +10,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{$SITE_RTL == 'on'?'rtl':''}}">
 <head>
     <title>
-        {{ Utility::getValByName('title_text') ? Utility::getValByName('title_text') : config('app.name', 'HRMGo') }}
+        {{ Utility::getValByName('title_text') ? Utility::getValByName('title_text') : config('app.name', 'ERPGo') }}
         - @yield('page-title')</title>
     <!-- Meta -->
     <meta charset="utf-8" />
@@ -44,6 +44,9 @@
     @else
         <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}"id="main-style-link">
     @endif
+
+    <link rel="stylesheet" href="{{ asset('css/custom.css') }}" id="main-style-link">
+
 </head>
 <body class={{$color}}>
 <!-- [ Pre-loader ] start -->
@@ -92,6 +95,8 @@
 <script src="{{ asset('js/custom.js') }}"></script>
 <script src="{{ asset('js/chatify/autosize.js') }}"></script>
 <script src='https://unpkg.com/nprogress@0.2.0/nprogress.js'></script>
+<script src="{{url('js/swiper.min.js')}}"></script>
+
 <!-- <script>
   if ($(".pc-dt-simple").length) {
     const dataTable = new simpleDatatables.DataTable(".pc-dt-simple");

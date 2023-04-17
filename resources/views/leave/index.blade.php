@@ -27,7 +27,7 @@
                     <table class="table datatable">
                             <thead>
                             <tr>
-                                @if(\Auth::user()->type!='employee')
+                                @if(\Auth::user()->type!='Employee')
                                     <th>{{__('Employee')}}</th>
                                 @endif
                                 <th>{{__('Leave Type')}}</th>
@@ -43,19 +43,19 @@
                             <tbody>
                             @foreach ($leaves as $leave)
                                 <tr>
-                                    @if(\Auth::user()->type!='employee')
+                                    @if(\Auth::user()->type!='Employee')
                                         <td>{{ !empty(\Auth::user()->getEmployee($leave->employee_id))?\Auth::user()->getEmployee($leave->employee_id)->name:'' }}</td>
                                     @endif
                                     <td>{{ !empty(\Auth::user()->getLeaveType($leave->leave_type_id))?\Auth::user()->getLeaveType($leave->leave_type_id)->title:'' }}</td>
                                     <td>{{ \Auth::user()->dateFormat($leave->applied_on )}}</td>
                                     <td>{{ \Auth::user()->dateFormat($leave->start_date ) }}</td>
                                     <td>{{ \Auth::user()->dateFormat($leave->end_date )  }}</td>
-                                    @php
-                                        $startDate = new \DateTime($leave->start_date);
-                                        $endDate   = new \DateTime($leave->end_date);
-                                        $total_leave_days = !empty($startDate->diff($endDate))?$startDate->diff($endDate)->days:0;
-                                    @endphp
-                                    <td>{{ $total_leave_days }}</td>
+{{--                                    @php--}}
+{{--                                        $startDate = new \DateTime($leave->start_date);--}}
+{{--                                        $endDate   = new \DateTime($leave->end_date);--}}
+{{--                                        $total_leave_days = !empty($startDate->diff($endDate))?$startDate->diff($endDate)->days:0;--}}
+{{--                                    @endphp--}}
+                                        <td>{{ $leave->total_leave_days }}</td>
                                     <td>{{ $leave->leave_reason }}</td>
                                     <td>
 

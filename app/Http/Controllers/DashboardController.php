@@ -579,12 +579,14 @@ class DashboardController extends Controller
                 }
                 $client_deal = $user->clientDeals->pluck('id');
 
-                $arrCount['deal'] = $user->clientDeals->count();
+                $arrCount['deal'] = !empty($user->clientDeals)? $user->clientDeals->count() : 0;
+
 
                 if(!empty($client_deal->first()))
                 {
 
-                    $arrCount['task'] = DealTask::where('deal_id', $client_deal)->count();
+                    $arrCount['task'] = DealTask::whereIn('deal_id', [$client_deal->first()])->count();
+
 
                 }
                 else

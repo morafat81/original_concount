@@ -2496,6 +2496,12 @@ class UsersTableSeeder extends Seeder
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
+                'name' => 'share project',
+                'guard_name' => 'web',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ],
+            [
                 'name' => 'create milestone',
                 'guard_name' => 'web',
                 'created_at' => date('Y-m-d H:i:s'),
@@ -3528,6 +3534,7 @@ class UsersTableSeeder extends Seeder
             ['name' => 'view project'],
             ['name' => 'edit project'],
             ['name' => 'delete project'],
+            ['name' => 'share project'],
             ['name' => 'create milestone'],
             ['name' => 'edit milestone'],
             ['name' => 'delete milestone'],

@@ -21,7 +21,9 @@ use App\Models\ActivityLog;
 use App\Models\ProjectTask;
 use App\Models\ProjectUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends Controller
@@ -103,6 +105,8 @@ class ProjectController extends Controller
             $project->estimated_hrs = $request->estimated_hrs;
             $project->tags = $request->tag;
             $project->created_by = \Auth::user()->creatorId();
+            $project['copylinksetting']   = '{"member":"on","milestone":"off","basic_details":"on","activity":"off","attachment":"on","bug_report":"on","task":"off","tracker_details":"off","timesheet":"off" ,"password_protected":"off"}';
+
             $project->save();
 
             if(\Auth::user()->type=='company'){
@@ -278,6 +282,7 @@ class ProjectController extends Controller
 
                 // Allocated Hours
                 $hrs = Project::projectHrs($project->id);
+
                 $project_data['task_allocated_hrs'] = [
                     'hrs' => number_format($hrs['allocated']) . '/' . number_format($hrs['allocated']),
                     'percentage' => Utility::getPercentage($hrs['allocated'], $hrs['allocated']),
@@ -1183,7 +1188,7 @@ class ProjectController extends Controller
         return $arrTask;
     }
 
-    //project copy module
+    //project duplicate module
     public function copyproject($id)
     {
         if(Auth::user()->can('create project'))
@@ -1418,6 +1423,313 @@ class ProjectController extends Controller
         }
 
     }
+
+    //share project module
+
+    public function copylink_setting_create( $projectID)
+    {
+        $objUser = Auth::user();
+        $project = Project::select('projects.*')->join('project_users', 'projects.id', '=', 'project_users.project_id')->where('project_users.user_id', '=', $objUser->id)->where('projects.id', '=', $projectID)->first();
+        $result = json_decode($project->copylinksetting);
+        return view('projects.copylink_setting', compact('project','projectID','result'));
+    }
+
+    public function copylinksetting(Request $request, $id  )
+    {
+        $objUser = Auth::user();
+
+        $data = [];
+        $data['basic_details']  = isset($request->basic_details) ? 'on' : 'off';
+        $data['member']  = isset($request->member) ? 'on' : 'off';
+        $data['milestone']  = isset($request->milestone) ? 'on' : 'off';
+        $data['client']  = isset($request->client) ? 'on' : 'off';
+        $data['progress']  = isset($request->progress) ? 'on' : 'off';
+        $data['activity']  = isset($request->activity) ? 'on' : 'off';
+        $data['attachment']  = isset($request->attachment) ? 'on' : 'off';
+        $data['bug_report']  = isset($request->bug_report) ? 'on' : 'off';
+        $data['expense']  = isset($request->expense) ? 'on' : 'off';
+        $data['task']  = isset($request->task) ? 'on' : 'off';
+        $data['tracker_details']  = isset($request->tracker_details) ? 'on' : 'off';
+        $data['timesheet']  = isset($request->timesheet) ? 'on' : 'off';
+        $data['password_protected']  = isset($request->password_protected) ? 'on' : 'off';
+        $project = Project::select('projects.*')
+            ->join('project_users', 'projects.id', '=', 'project_users.project_id')
+            ->where('project_users.user_id', '=', $objUser->id)
+            ->where('projects.id', '=', $id)->first();
+
+        if(isset($request->password_protected) && $request->password_protected == 'on' ){
+            $project->password = base64_encode($request->password);
+
+        }else{
+            $project->password = null;
+        }
+
+
+        $project->copylinksetting = (count($data) > 0 ) ? json_encode($data) : null;
+        $project->save();
+        return redirect()->back()->with('success', __('Copy Link Setting Save Successfully!'));
+    }
+
+    public function projectlink(Request $request,$project_id, $lang='')
+    {
+        $id=\Illuminate\Support\Facades\Crypt::decrypt($project_id);
+
+        $project = Project::find($id);
+
+        $data = [];
+        $data['basic_details']  = isset($request->basic_details) ? 'on' : 'off';
+        $data['member']  = isset($request->member) ? 'on' : 'off';
+        $data['milestone']  = isset($request->milestone) ? 'on' : 'off';
+        $data['activity']  = isset($request->activity) ? 'on' : 'off';
+        $data['attachment']  = isset($request->attachment) ? 'on' : 'off';
+        $data['bug_report']  = isset($request->bug_report) ? 'on' : 'off';
+        $data['expense']  = isset($request->expense) ? 'on' : 'off';
+        $data['task']  = isset($request->task) ? 'on' : 'off';
+        $data['tracker_details']  = isset($request->tracker_details) ? 'on' : 'off';
+        $data['timesheet']  = isset($request->timesheet) ? 'on' : 'off';
+        $data['password_protected']  = isset($request->password_protected) ? 'on' : 'off';
+
+
+        if(Auth::user() != null){
+            $usr         = Auth::user();
+        }else{
+            $usr         = User::where('id',$project->created_by)->first();
+        }
+
+        $user_projects = $usr->projects->pluck('id')->toArray();
+
+        $project_data = [];
+
+        // Task Count
+        $project_task         = $project->tasks->count();
+
+        $project_done_task    = $project->tasks->where('is_complete', '=', 1)->count();
+
+        $project_data['task'] = [
+            'total' => number_format($project_task),
+            'done' => number_format($project_done_task),
+            'percentage' => Utility::getPercentage($project_done_task, $project_task),
+        ];
+
+        // end Task Count
+
+
+        // Users Assigned
+        $total_users = User::where('created_by', '=', $usr->id)->count();
+
+        $project_data['user_assigned'] = [
+            'total' => number_format($total_users) . '/' . number_format($total_users),
+            'percentage' => Utility::getPercentage($total_users, $total_users),
+        ];
+        // End Users Assigned
+
+
+        // Day left
+        $total_day   = Carbon::parse($project->start_date)->diffInDays(Carbon::parse($project->end_date));
+        $remaining_day = Carbon::parse($project->start_date)->diffInDays(now());
+        $project_data['day_left'] = [
+            'day' => number_format($remaining_day) . '/' . number_format($total_day),
+            'percentage' => Utility::getPercentage($remaining_day, $total_day),
+        ];
+        // end day left
+
+        if($usr->checkProject($project->id) == 'Owner')
+        {
+            $remaining_task = ProjectTask::where('project_id', '=', $project->id)->where('is_complete', '=', 0)->count();
+            $total_task     = ProjectTask::where('project_id', '=', $project->id)->count();
+        }
+        else
+        {
+            $remaining_task = ProjectTask::where('project_id', '=', $project->id)->where('is_complete', '=', 0)->whereRaw("find_in_set('" . $usr->id . "',assign_to)")->count();
+            $total_task     = ProjectTask::where('project_id', '=', $project->id)->whereRaw("find_in_set('" . $usr->id . "',assign_to)")->count();
+        }
+        $project_data['open_task'] = [
+            'tasks' => number_format($remaining_task) . '/' . number_format($total_task),
+            'percentage' => Utility::getPercentage($remaining_task, $total_task),
+        ];
+
+        // Milestone
+        $total_milestone           = $project->milestones()->count();
+
+        $complete_milestone        = $project->milestones()->where('status', 'LIKE', 'complete')->count();
+        $project_data['milestone'] = [
+            'total' => number_format($complete_milestone) . '/' . number_format($total_milestone),
+            'percentage' => Utility::getPercentage($complete_milestone, $total_milestone),
+        ];
+        // End Milestone
+
+
+        // Chart
+        $seven_days      = Utility::getLastSevenDays();
+        $chart_task      = [];
+        $chart_timesheet = [];
+        $cnt             = 0;
+        $cnt1            = 0;
+
+        foreach(array_keys($seven_days) as $k => $date)
+        {
+            if($usr->checkProject($project->id) == 'Owner')
+            {
+                $task_cnt     = $project->tasks()->where('is_complete', '=', 1)->where('marked_at', 'LIKE', $date)->count();
+                $arrTimesheet = $project->timesheets()->where('date', 'LIKE', $date)->pluck('time')->toArray();
+            }
+            else
+            {
+                $task_cnt     = $project->tasks()->where('is_complete', '=', 1)->whereRaw("find_in_set('" . $usr->id . "',assign_to)")->where('marked_at', 'LIKE', $date)->count();
+                $arrTimesheet = $project->timesheets()->where('created_by', '=', $usr->id)->where('date', 'LIKE', $date)->pluck('time')->toArray();
+            }
+
+            // Task Chart Count
+            $cnt += $task_cnt;
+
+            // Timesheet Chart Count
+            $timesheet_cnt = str_replace(':', '.', Utility::timeToHr($arrTimesheet));
+            $cn[]          = $timesheet_cnt;
+            $cnt1          += number_format($timesheet_cnt, 2);
+
+            $chart_task[]      = $task_cnt;
+            $chart_timesheet[] = number_format($timesheet_cnt, 2);
+        }
+
+        // Allocated Hours
+        $hrs                                = Project::projectHrs($project->id);
+
+
+        $project_data['task_allocated_hrs'] = [
+            'hrs' => number_format($hrs['allocated']) . '/' . number_format($hrs['allocated']),
+            'percentage' => Utility::getPercentage($hrs['allocated'], $hrs['allocated']),
+        ];
+
+        // end allocated hours
+
+        // Time spent
+        if($usr->checkProject($project->id) == 'Owner')
+        {
+            $times = $project->timesheets->pluck('time')->toArray();
+        }
+        else
+        {
+            $times = $project->timesheets()->where('created_by', '=', $usr->id)->pluck('time')->toArray();
+        }
+        $totaltime                  = str_replace(':', '.', Utility::timeToHr($times));
+        $estimatedtime              = $project->estimated_hrs != '' ? $project->estimated_hrs : '0';
+        $project_data['time_spent'] = [
+            'total' => number_format($totaltime) . '/' . number_format($estimatedtime),
+            'percentage' => Utility::getPercentage(number_format($totaltime), $estimatedtime),
+        ];
+        // end time spent
+
+        $project_data['task_chart']      = [
+            'chart' => $chart_task,
+            'total' => $cnt,
+        ];
+
+        $project_data['timesheet_chart'] = [
+            'chart' => $chart_timesheet,
+            'total' => $cnt1,
+        ];
+        if(isset($request->milestone) && in_array("milestone", $request->milestone)){
+            $milestones = Milestone::where('project_id',$project->id)->get();
+
+            foreach ($milestones as $milestone) {
+
+                $post                   = new Milestone();
+                $post['project_id']     = $milestone->id;
+                $post['title']          = $milestone->title;
+                $post['status']         = $milestone->status;
+                $post['description']    = $milestone->description;
+                $post->save();
+            }
+        }
+
+        if(isset($request->task) && in_array("task", $request->task)){
+            $tasks = ProjectTask::where('project_id',$project->id)->where('stage_id',$stage->id)->get();
+            $activities = ActivityLog::where('project_id',$project->id)->where('task_id',$task->id)->get();
+
+            foreach($activities as $activity){
+
+                $activitylog                = new ActivityLog();
+                $activitylog['user_id']     = $activity->user_id;
+                $activitylog['project_id']  = $activity->id;
+                $activitylog['task_id']     = $activity->id;
+                $activitylog['log_type']    = $activity->log_type;
+                $activitylog['remark']      = $activity->remark;
+                $activitylog->save();
+            }
+        }
+
+        $stages = TaskStage::where('project_id', '=', $id)->orderBy('order')->get();
+        foreach ($stages as &$status)
+        {
+            $stageClass[] = 'task-list-' . $status->id;
+            $task = ProjectTask::where('project_id', '=', $id);
+
+            // check project is shared or owner
+            if ($usr->checkProject($project_id) == 'Shared') {
+                $task->whereRaw(
+                    "find_in_set('" . $usr->id . "',assign_to)"
+                );
+            }
+            //end
+
+            $task->orderBy('order');
+            $status['tasks'] = $task ->where('stage_id', '=', $status->id) ->get();
+        }
+
+        $treckers=TimeTracker::where('project_id',$id)->where('created_by',$usr->id)->get();
+
+        //bug report
+
+            $bugs = Bug::where('project_id',$project->id)->get();
+
+
+        //task
+        $tasks = ProjectTask::where('project_id',$project->id)->get();
+
+        //lang
+
+
+        $lang = !empty($lang) ? $lang : (!empty($usr->lang) ? $usr->lang : env('DEFAULT_ADMIN_LANG')) ;
+
+        \App::setLocale($lang);
+
+//        dd($lang);
+
+
+
+        if(\Session::get('copy_pass_true'. $id) == $project->password . '-' . $id)
+        {
+
+            return view('projects.copylink', compact('data','project','project_data','stages','treckers','usr','bugs','tasks','lang'));
+        }else
+        {
+
+            if(!isset(json_decode($project->copylinksetting)->password_protected) || json_decode($project->copylinksetting)->password_protected != 'on')
+            {
+
+                return view('projects.copylink', compact('data','project','project_data','stages','treckers','usr','lang','tasks','bugs'));
+
+            }elseif(isset(json_decode($project->copylinksetting)->password_protected) && json_decode($project->copylinksetting)->password_protected == 'on' && $request->password == base64_decode($project->password)){
+
+                \Session::put('copy_pass_true'.$id, $project->password . '-' . $id);
+
+
+                return view('projects.copylink', compact('data','project','project_data','stages','treckers','usr','lang','bugs','tasks'));
+
+            }else{
+
+
+                return view('projects.copylink_password', compact('id'));
+            }
+        }
+
+    }
+
+
+
+
+
+
 
 
 

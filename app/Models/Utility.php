@@ -169,7 +169,7 @@ class Utility extends Model
             'warning_sent' =>'1',
             'new_contract' =>'1',
             'vat_gst_number_switch' =>'off',
-            'google_calendar_enable' => '',
+            'google_calendar_enable' => 'on',
 
 
 
@@ -321,7 +321,7 @@ class Utility extends Model
             'new_contract' =>'1',
 
             'vat_gst_number_switch' =>'off',
-            'google_calendar_enable' => '',
+            'google_calendar_enable' => 'on',
 
         ];
 
@@ -2319,6 +2319,7 @@ class Utility extends Model
             'edit contract type',
             'delete contract type',
             'create barcode',
+            'share project',
 
         ];
         foreach($arrPermissions as $ap)
@@ -2372,6 +2373,7 @@ class Utility extends Model
             'delete contract type',
             'create barcode',
             'show crm dashboard',
+            'share project',
         ];
         foreach($companyNewPermission as $op)
         {
@@ -2736,15 +2738,14 @@ class Utility extends Model
     }
 
     public static function colorset()
-
     {
 
         if(\Auth::check())
         {
+
             if(\Auth::user()->type == 'super admin')
             {
                 $user = \Auth::user();
-
                 $setting = DB::table('settings')->where('created_by',$user->id)->pluck('value','name')->toArray();
             }
             else

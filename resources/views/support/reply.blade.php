@@ -15,133 +15,112 @@
     <li class="breadcrumb-item active" aria-current="page">{{__('Support Reply')}}</li>
 @endsection
 @section('action-btn')
+    <div class="float-end">
+        <a href="#" data-size="lg" data-url="{{ route('support.edit',$support->id) }}" data-ajax-popup="true"
+           data-bs-toggle="tooltip" title="{{__('Edit')}}" data-title="{{__('Edit Support')}}" class="btn btn-sm btn-primary">
+            <i class="ti ti-pencil"></i>
+        </a>
+    </div>
 @endsection
-@section('filter')
-@endsection
+
 @section('content')
     <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">{{$support->subject}}</h6>
-                </div>
-                @if(!empty($support->descroption))
-                    <div class="card-body py-3 flex-grow-1">
-                        <p class="text-sm mb-0">
-                            {{$support->descroption}}
-                        </p>
-                    </div>
-                @endif
-                <div class="card-footer py-0">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item px-0">
-                            <div class="row align-items-center">
-                                <div class="col-6">
-                                    <span class="form-label">{{__('Created By')}}:</span>
-                                </div>
-                                <div class="col-6 text-end">
-                                    {{!empty($support->createdBy)?$support->createdBy->name:''}}
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item px-0">
-                            <div class="row align-items-center">
-                                <div class="col-6">
-                                    <span class="form-label">{{__('Ticket Code')}}:</span>
-                                </div>
-                                <div class="col-6 text-end">
-                                    {{$support->ticket_code}}
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item px-0">
-                            <div class="row align-items-center">
-                                <div class="col-6">
-                                    <span class="form-label">{{__('Priority')}}:</span>
-                                </div>
-                                <div class="col-6 text-end">
+        <div class="col-12">
+            <div class="row gy-4">
+                <div class="col-lg-6">
+                    <div class="row">
+                        <h5 class="mb-3">{{__('Reply Ticket')}} - <span class="text-success">{{$support->ticket_code}}</span></h5>
+                        <div class="card border">
+                            <div class="card-body p-0">
+                                <div class="p-4 border-bottom">
                                     @if($support->priority == 0)
-                                        <span class="badge bg-primary p-2 px-3 rounded">   {{ __(\App\Models\Support::$priority[$support->priority]) }}</span>
+                                        <span class="badge bg-primary mb-2">   {{ __(\App\Models\Support::$priority[$support->priority]) }}</span>
                                     @elseif($support->priority == 1)
-                                        <span class="badge bg-info p-2 px-3 rounded">   {{ __(\App\Models\Support::$priority[$support->priority]) }}</span>
+                                        <span class="badge bg-info mb-2">   {{ __(\App\Models\Support::$priority[$support->priority]) }}</span>
                                     @elseif($support->priority == 2)
-                                        <span class="badge bg-warning p-2 px-3 rounded">   {{ __(\App\Models\Support::$priority[$support->priority]) }}</span>
+                                        <span class="badge bg-warning mb-2">   {{ __(\App\Models\Support::$priority[$support->priority]) }}</span>
                                     @elseif($support->priority == 3)
-                                        <span class="badge bg-danger p-2 px-3 rounded">   {{ __(\App\Models\Support::$priority[$support->priority]) }}</span>
+                                        <span class="badge bg-danger mb-2">   {{ __(\App\Models\Support::$priority[$support->priority]) }}</span>
                                     @endif
+                                    <div class="d-flex justify-content-between align-items-center ">
+                                        <h5>{{$support->subject}}</h5>
+                                        @if($support->status == 'Open')
+                                            <span class="badge bg-light-primary p-2 f-w-600 text-primary rounded"> {{__('Open')}}</span>
+                                        @elseif($support->status == 'Close')
+                                            <span class="badge bg-light-danger p-2 f-w-600 text-danger rounded">   {{ __('Closed') }}</span>
+                                        @elseif($support->status == 'On Hold')
+                                            <span class="badge bg-light-warning p-2 f-w-600 text-warning rounded">   {{ __('On Hold') }}</span>
+                                        @endif
+                                    </div>
+                                    <p class="mb-0">
+                                        <b> {{!empty($support->createdBy)?$support->createdBy->name:''}}</b>
+                                        .
+                                        <span> {{!empty($support->createdBy)?$support->createdBy->email:''}}</span>
+                                        .
+                                        <span class="text-muted">{{\Auth::user()->dateFormat($support->created_at)}}</span>
+                                    </p>
                                 </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item px-0">
-                            <div class="row align-items-center">
-                                <div class="col-6">
-                                    <span class="form-label">{{__('Status')}}:</span>
-                                </div>
-                                <div class="col-6 text-end">
-                                    @if($support->status == 'Open')
-                                        <span class="badge bg-primary p-2 px-3 rounded"> {{__('Open')}}</span>
-                                    @elseif($support->status == 'Close')
-                                        <span class="badge bg-danger p-2 px-3 rounded">   {{ __('Closed') }}</span>
-                                    @elseif($support->status == 'On Hold')
-                                        <span class="badge bg-warning p-2 px-3 rounded">   {{ __('On Hold') }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item px-0">
-                            <div class="row align-items-center">
-                                <div class="col-6">
-                                    <small>{{__('Start Date')}}:</small>
-                                    <div class="h6 mb-0">{{\Auth::user()->dateFormat($support->created_at)}}</div>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+                                @if(!empty($support->description))
+                                    <div class="p-4">
+                                        <p class="">{{$support->description}}</p>
+                                        @if(!empty($support->attachment))
+                                        <h6>{{__('Attachments')}} :</h6>
+                                        <a href="{{asset(Storage::url('uploads/supports')).'/'.$support->attachment}}"
+                                           download="" class="bg-secondary d-inline-flex p-2 rounded text-white " target="_blank">
+                                            <i class="ti ti-download text-white me-2 mt-1" data-bs-toggle="tooltip" ></i>
 
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
+                                            {{ $support->attachment }}
+                                        </a>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                     @if($support->status == 'Open')
-                    <h5 class="mt-0 mb-3">{{__('Comments')}}</h5>
-                    {{ Form::open(array('route' => array('support.reply.answer',$support->id))) }}
-                    <textarea class="form-control form-control-light mb-2" name="description" placeholder="Your comment" id="example-textarea" rows="3" required=""></textarea>
-                    <div class="text-end">
-                        <div class=" mb-2 ml-2">
-                            {{Form::submit(__('Send'),array('class'=>'btn btn-primary'))}}
+                    <div class="row">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="mb-3">{{__('Comments')}}</h5>
+                                    {{ Form::open(array('route' => array('support.reply.answer',$support->id))) }}
+                                    <textarea class="form-control form-control-light mb-2" name="description" placeholder="Your comment" id="example-textarea" rows="3" required=""></textarea>
+                                    <div class="text-end">
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-success w-100"> <i class="ti ti-circle-plus me-1 mb-0"></i> {{__('Send')}}</button>
+                                        </div>
+                                    </div>
+                                    {{ Form::close() }}
+                            </div>
                         </div>
                     </div>
-                    {{ Form::close() }}
                     @endif
+                </div>
 
-                    <div class="scrollbar-inner">
-                        <div class="list-group list-group-flush support-reply-box">
-                            @foreach($replyes as $reply)
-                              
-
-
-                                 <div class="list-group-item px-0">
-                        <div class="row align-items-center">
-                            <div class="col-auto">
-                                <a href="#" class="avatar avatar-sm ms-2">
-                                <img alt="" class=" " @if(!empty($reply->users) && !empty($reply->users->avatar)) src="{{asset(Storage::url('uploads/avatar/')).'/'.$reply->users->avatar}}" @else  src="{{asset(Storage::url('uploads/avatar/')).'/avatar.png'}}" @endif>
-                                </a>
+                <div class="col-lg-6">
+                    <h5 class="mb-3">{{__('Replies')}}</h5>
+                    @foreach($replyes as $reply)
+                        <div class="card border">
+                            <div class="card-header row d-flex align-items-center justify-content-between">
+                                <div class="header-right col d-flex align-items-start">
+                                    <a href="#" class="avatar avatar-sm me-3">
+                                        <img alt="" class=" " @if(!empty($reply->users) && !empty($reply->users->avatar)) src="{{asset(Storage::url('uploads/avatar/')).'/'.$reply->users->avatar}}" @else  src="{{asset(Storage::url('uploads/avatar/')).'/avatar.png'}}" @endif>
+                                    </a>
+                                    <h6 class="mb-0">{{!empty($reply->users)?$reply->users->name:''}}
+                                        <div class="d-block text-muted">{{!empty($reply->users)?$reply->users->email:''}}</div>
+                                    </h6>
+                                </div>
+                                <p class="col-auto ms-1 mb-0"> <span class="text-muted">{{$reply->created_at->diffForHumans()}}</span></p>
                             </div>
-                            <div class="col ml-n2">
-                                <span class="text-dark text-sm">{{!empty($reply->users)?$reply->users->name:''}} </span>
-                                <a class="d-block h6 text-sm font-weight-light mb-0">{{$reply->description}}</a>
-                                <small class="d-block">{{$reply->created_at}}</small>
+                            <div class="card-body">
+                                <p class="mb-0">{{$reply->description}}</p>
                             </div>
                         </div>
-                    </div>
-                            @endforeach
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
     </div>
+
 @endsection
 

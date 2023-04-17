@@ -69,15 +69,16 @@
                             @php($i=0)
                             @foreach($pipelines as $key => $pipeline)
                                 <div class="tab-pane fade show @if($i==0) active @endif" id="tab{{$key}}" role="tabpanel" aria-labelledby="pills-user-tab-1">
-                                    <ul class="list-group sortable">
+                                    <ul class="list-unstyled list-group sortable stage">
                                         @foreach ($pipeline['lead_stages'] as $lead_stages)
-                                            <li class="list-group-item" data-id="{{$lead_stages->id}}">
-                                                <span class="text-xs text-dark">{{$lead_stages->name}}</span>
+                                            <li class="d-flex align-items-center justify-content-between list-group-item" data-id="{{$lead_stages->id}}">
+                                                <h6 class="mb-0">
+                                                    <i class="me-3 ti ti-arrows-maximize " data-feather="move"></i>
+                                                    <span>{{$lead_stages->name}}</span>
+                                                </h6>
                                                 <span class="float-end">
-
-                                                @can('edit lead stage')
-                                                        <div class="action-btn bg-info ms-2">
-                                                        <a href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ URL::to('lead_stages/'.$lead_stages->id.'/edit') }}" data-ajax-popup="true" data-size="md" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-title="{{__('Edit Lead Stages')}}">
+                                                    @can('edit lead stage')
+                                                        <div class="action-btn bg-info ms-2"><a href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ URL::to('lead_stages/'.$lead_stages->id.'/edit') }}" data-ajax-popup="true" data-size="md" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-title="{{__('Edit Lead Stages')}}">
                                                             <i class="ti ti-pencil text-white"></i>
                                                         </a>
                                                     </div>
@@ -91,7 +92,7 @@
                                                             </div>
                                                         @endcan
                                                     @endif
-                                            </span>
+                                                </span>
                                             </li>
                                         @endforeach
                                     </ul>
@@ -99,7 +100,7 @@
                                 @php($i++)
                             @endforeach
                         </div>
-                        <p class="text-muted mt-4"><strong>{{__('Note')}} : </strong>{{__('You can easily change order of lead stage using drag & drop.')}}</p>
+                        <p class=" mt-4"><strong>{{__('Note')}} : </strong><b>{{__('You can easily change order of lead stage using drag & drop.')}}</b></p>
                     </div>
                 </div>
             </div>
